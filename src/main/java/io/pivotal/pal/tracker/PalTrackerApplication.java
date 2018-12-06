@@ -19,8 +19,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 public class PalTrackerApplication {
 
 	private String driverClassName = "com.mysql.jdbc.Driver";
-	@Value("${SPRING_DATASOURCE_URL}")
-	private String url;
+	private String url=System.getenv("SPRING_DATASOURCE_URL");
 	private String dbUsername = "tracker";
 	private String dbPassword = "";
 
@@ -30,9 +29,7 @@ public class PalTrackerApplication {
 
 	@Bean
 	JdbcTimeEntryRepository jdbcTimeEntryRepository() {
-		MysqlDataSource dataSource = new MysqlDataSource();
-		dataSource.setUrl(System.getenv("SPRING_DATASOURCE_URL"));
-		return new JdbcTimeEntryRepository(dataSource);
+		return new JdbcTimeEntryRepository(getDataSource());
 	}
 
 	@Bean
