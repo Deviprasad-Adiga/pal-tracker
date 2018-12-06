@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.mysql.cj.jdbc.MysqlDataSource;
 
 import javax.sql.DataSource;
 
@@ -19,35 +20,35 @@ public class PalTrackerApplication {
 
 	private String driverClassName = "com.mysql.jdbc.Driver";
 	@Value("${SPRING_DATASOURCE_URL}")
-    private String url;
-    private String dbUsername = "tracker";
-    private String dbPassword = "";
-    
-    public static void main(String[] args) {
-        SpringApplication.run(PalTrackerApplication.class, args);
-    }
+	private String url;
+	private String dbUsername = "tracker";
+	private String dbPassword = "";
 
-    @Bean
-    JdbcTimeEntryRepository jdbcTimeEntryRepository() {
-    	DataSource dataSource = getDataSource();
-        return new JdbcTimeEntryRepository(dataSource);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(PalTrackerApplication.class, args);
+	}
 
-    @Bean
-    public ObjectMapper jsonObjectMapper() {
-        return Jackson2ObjectMapperBuilder.json()
-                .serializationInclusion(JsonInclude.Include.NON_NULL) // Don’t include null values
-                .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS) //ISODate
-                .modules(new JavaTimeModule())
-                .build();
-    }
-    
-    private DataSource getDataSource() {
-    	DriverManagerDataSource dataSource = new DriverManagerDataSource();
-    	dataSource.setDriverClassName(driverClassName);
-    	dataSource.setUrl(url);
-    	dataSource.setUsername(dbUsername);
-    	dataSource.setPassword(dbPassword);
-    	return dataSource;
-    }
+	@Bean
+	JdbcTimeEntryRepository jdbcTimeEntryRepository() {
+		MysqlDataSource dataSource = new MysqlDataSource();
+		dataSource.setUrl(System.getenv("SPRING_DATASOURCE_URL"));
+		return new JdbcTimeEntryRepository(dataSource);
+	}
+
+	@Bean
+	public ObjectMapper jsonObjectMapper() {
+		return Jackson2ObjectMapperBuilder.json().serializationInclusion(JsonInclude.Include.NON_NULL) // Don’t include
+																										// null values
+				.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS) // ISODate
+				.modules(new JavaTimeModule()).build();
+	}
+
+	private DataSource getDataSource() {
+		DriverManagerDataSource dataSource = new DriverManagerDataSource();
+		dataSource.setDriverClassName(driverClassName);
+		dataSource.setUrl(url);
+		dataSource.setUsername(dbUsername);
+		dataSource.setPassword(dbPassword);
+		return dataSource;
+	}
 }
