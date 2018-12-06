@@ -20,8 +20,8 @@ public class PalTrackerApplication {
 
 	private String driverClassName = "com.mysql.jdbc.Driver";
 	private String url=System.getenv("SPRING_DATASOURCE_URL");
-	private String dbUsername = "tracker";
-	private String dbPassword = "";
+	private String dbUsername = System.getenv("USER");
+	private String dbPassword = System.getenv("PASSWORD");
 
 	public static void main(String[] args) {
 		SpringApplication.run(PalTrackerApplication.class, args);
